@@ -61,11 +61,106 @@
           <mat-card-subtitle>{{ user.role }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <p>This is your dashboard. More features will be added soon.</p>
+          <p>Manage assets and review analytics for company {{ companyId }}.</p>
         </mat-card-content>
       </mat-card>
 
       <app-create-user *ngIf="user && user.role === 'admin'"></app-create-user>
+
+      <mat-card class="asset-card">
+        <mat-card-header>
+          <mat-card-title>Asset Management</mat-card-title>
+          <mat-card-subtitle>Connected to /api/assets endpoints</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>
+          <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+          <div class="asset-row">
+            <input type="number" [(ngModel)]="assetIdInput" placeholder="Asset ID" />
+            <button mat-raised-button color="primary" (click)="getAssetById()">Get by ID</button>
+            <button mat-stroked-button color="warn" (click)="deleteAsset()">Delete</button>
+            <button mat-stroked-button (click)="loadAnalytics()">Refresh analytics</button>
+          </div>
+
+          <h3>Create Asset (POST /api/assets)</h3>
+          <div class="asset-grid">
+            <input [(ngModel)]="createAssetModel.name" placeholder="Name*" />
+            <input [(ngModel)]="createAssetModel.type" placeholder="Type*" />
+            <input [(ngModel)]="createAssetModel.description" placeholder="Description" />
+            <input [(ngModel)]="createAssetModel.classification" placeholder="Classification" />
+            <input [(ngModel)]="createAssetModel.location" placeholder="Location" />
+            <input [(ngModel)]="createAssetModel.owner" placeholder="Owner" />
+            <input [(ngModel)]="createAssetModel.value" placeholder="Value" />
+            <input [(ngModel)]="createAssetModel.status" placeholder="Status" />
+            <input [(ngModel)]="createAssetModel.username" placeholder="Username*" />
+            <input [ngModel]="companyId" disabled placeholder="Company ID*" />
+          </div>
+          <button mat-raised-button color="primary" (click)="createAsset()">Create Asset</button>
+
+          <h3>Update Selected Asset (PUT /api/assets/:id)</h3>
+          <div class="asset-grid">
+            <input [(ngModel)]="updateAssetModel.name" placeholder="Name" />
+            <input [(ngModel)]="updateAssetModel.type" placeholder="Type" />
+            <input [(ngModel)]="updateAssetModel.description" placeholder="Description" />
+            <input [(ngModel)]="updateAssetModel.classification" placeholder="Classification" />
+            <input [(ngModel)]="updateAssetModel.location" placeholder="Location" />
+            <input [(ngModel)]="updateAssetModel.owner" placeholder="Owner" />
+            <input [(ngModel)]="updateAssetModel.value" placeholder="Value" />
+            <input [(ngModel)]="updateAssetModel.status" placeholder="Status" />
+          </div>
+          <button mat-raised-button color="accent" (click)="updateAsset()">Update Asset</button>
+
+          <h3>Loaded Assets</h3>
+          <div class="asset-list" *ngIf="assets.length; else emptyAssets">
+            <button
+              class="asset-pill"
+              *ngFor="let asset of assets"
+              (click)="selectAsset(asset)"
+            >
+              #{{ asset.asset_id }} - {{ asset.name }} ({{ asset.status || 'n/a' }})
+            </button>
+          </div>
+          <ng-template #emptyAssets>
+            <p>No assets loaded yet. Use "Get by ID" or create one.</p>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="asset-card">
+        <mat-card-header>
+          <mat-card-title>Asset Analytics</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="analyticsSummary as summary" class="summary">
+            <p><strong>Total assets:</strong> {{ summary.totalAssets }}</p>
+            <p><strong>High value assets:</strong> {{ summary.highValueAssets }}</p>
+          </div>
+
+          <div class="analytics-grid">
+            <div>
+              <h4>By Type</h4>
+              <p *ngFor="let row of analyticsByType">{{ row.key }}: {{ row.count }}</p>
+            </div>
+            <div>
+              <h4>By Status</h4>
+              <p *ngFor="let row of analyticsByStatus">{{ row.key }}: {{ row.count }}</p>
+            </div>
+            <div>
+              <h4>By Value</h4>
+              <p *ngFor="let row of analyticsByValue">{{ row.key }}: {{ row.count }}</p>
+            </div>
+            <div>
+              <h4>By Classification</h4>
+              <p *ngFor="let row of analyticsByClassification">{{ row.key }}: {{ row.count }}</p>
+            </div>
+            <div>
+              <h4>By Month</h4>
+              <p *ngFor="let row of analyticsByMonth">{{ row.label }}: {{ row.count }}</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -56,6 +56,31 @@ export interface GetAssetResponse {
   asset: Asset;
 }
 
+export interface CompanyAssetListItem {
+  asset_id: number;
+  mysql?: {
+    asset_id: number;
+    user_cr_id: number;
+    comp_id: number;
+    last_upd: string | null;
+  };
+  mongo?: {
+    asset_id: number;
+    name?: string;
+    type?: string;
+    description?: string;
+    classification?: string;
+    location?: string;
+    owner?: string;
+    value?: string;
+    status?: string;
+    risks?: unknown[];
+    controls?: unknown[];
+    created_at?: string;
+    updated_at?: string;
+  };
+}
+
 export interface AnalyticsItem {
   key: string;
   count: number;
@@ -97,6 +122,10 @@ export class AssetService {
 
   createAsset(payload: CreateAssetPayload): Observable<CreateAssetResponse> {
     return this.http.post<CreateAssetResponse>(this.assetsBaseUrl, payload);
+  }
+
+  getAssets(companyId: number): Observable<CompanyAssetListItem[]> {
+    return this.http.get<CompanyAssetListItem[]>(`${this.assetsBaseUrl}?companyId=${Number(companyId)}`);
   }
 
   getAssetById(assetId: number): Observable<GetAssetResponse> {

@@ -1,0 +1,280 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BaseChartDirective } from 'ng2-charts';
+import {
+  AnalyticsByMonthItem,
+  AnalyticsItem,
+  AnalyticsSummary,
+  Asset,
+  AssetService,
+  CompanyAssetListItem,
+  CreateAssetPayload,
+  UpdateAssetPayload,
+} from '../../services/asset.service';
+import { AuthService } from '../../auth/auth.service';
+import { ChartConfiguration } from 'chart.js';
+
+@Component({
+  selector: 'app-asset-management',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatInputModule,
+    MatTableModule,
+    MatIconModule,
+    MatTooltipModule,
+    BaseChartDirective,
+  ],
+  templateUrl: './asset-management.component.html',
+  styleUrl: './asset-management.component.scss',
+})
+export class AssetManagementComponent implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly assetService = inject(AssetService);
+
+  readonly user = this.authService.getUser();
+  readonly companyId = Number(this.user?.companyId || 0);
+  readonly displayedColumns = ['asset_id', 'name', 'type', 'status', 'value', 'classification', 'actions'];
+
+  assets: Asset[] = [];
+  selectedAssetId: number | null = null;
+  statusMessage = '';
+  errorMessage = '';
+
+  createAssetModel: CreateAssetPayload = {
+    name: '',
+    type: '',
+    username: this.user?.username || '',
+    companyId: this.companyId,
+    description: '',
+    classification: '',
+    location: '',
+    owner: '',
+    value: 'high',
+    status: 'active',
+  };
+
+  updateAssetModel: UpdateAssetPayload = {
+    name: '',
+    type: '',
+    description: '',
+    classification: '',
+    location: '',
+    owner: '',
+    value: '',
+    status: '',
+  };
+
+  analyticsByType: AnalyticsItem[] = [];
+  analyticsByStatus: AnalyticsItem[] = [];
+  analyticsByValue: AnalyticsItem[] = [];
+  analyticsByClassification: AnalyticsItem[] = [];
+  analyticsByMonth: AnalyticsByMonthItem[] = [];
+  analyticsSummary: AnalyticsSummary | null = null;
+
+  byTypeChartData: ChartConfiguration<'bar'>['data'] = { labels: [], datasets: [{ data: [], label: 'Assets by type' }] };
+  byStatusChartData: ChartConfiguration<'doughnut'>['data'] = {
+    labels: [],
+    datasets: [{ data: [], label: 'Assets by status' }],
+  };
+  byValueChartData: ChartConfiguration<'pie'>['data'] = { labels: [], datasets: [{ data: [], label: 'Assets by value' }] };
+  byClassificationChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [{ data: [], label: 'Assets by classification' }],
+  };
+  byMonthChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [{ data: [], label: 'Assets by month' }] };
+
+  ngOnInit(): void {
+    this.loadAssets();
+    this.loadAnalytics();
+  }
+
+  loadAssets(): void {
+    this.clearMessages();
+    if (!this.companyId) {
+      this.errorMessage = 'Missing company ID.';
+      return;
+    }
+
+    this.assetService.getAssets(this.companyId).subscribe({
+      next: (res) => {
+        this.assets = (res || []).map((item) => this.toAsset(item));
+      },
+      error: () => {
+        this.errorMessage =
+          'Assets could not be loaded with GET /api/assets?companyId=. Please confirm backend endpoint shape.';
+      },
+    });
+  }
+
+  createAsset(): void {
+    this.clearMessages();
+    if (!this.createAssetModel.name || !this.createAssetModel.type || !this.createAssetModel.username || !this.companyId) {
+      this.errorMessage = 'Name, type, username and companyId are required.';
+      return;
+    }
+
+    this.assetService.createAsset(this.createAssetModel).subscribe({
+      next: (res) => {
+        this.statusMessage = `${res.message} (ID: ${res.assetId})`;
+        this.loadAssets();
+        this.loadAnalytics();
+      },
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  startEdit(asset: Asset): void {
+    this.selectedAssetId = asset.asset_id;
+    this.updateAssetModel = {
+      name: asset.name || '',
+      type: asset.type || '',
+      description: asset.description || '',
+      classification: asset.classification || '',
+      location: asset.location || '',
+      owner: asset.owner || '',
+      value: asset.value || '',
+      status: asset.status || '',
+    };
+  }
+
+  updateAsset(): void {
+    this.clearMessages();
+    const id = Number(this.selectedAssetId);
+    if (!id) {
+      this.errorMessage = 'Please select an asset to edit.';
+      return;
+    }
+
+    this.assetService.updateAsset(id, this.updateAssetModel).subscribe({
+      next: (res) => {
+        this.statusMessage = res.message;
+        this.loadAssets();
+        this.loadAnalytics();
+      },
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  deleteAsset(assetId: number): void {
+    this.clearMessages();
+    this.assetService.deleteAsset(Number(assetId)).subscribe({
+      next: (res) => {
+        this.statusMessage = res.message;
+        this.assets = this.assets.filter((asset) => asset.asset_id !== assetId);
+        if (this.selectedAssetId === assetId) {
+          this.selectedAssetId = null;
+        }
+        this.loadAnalytics();
+      },
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  loadAnalytics(): void {
+    if (!this.companyId) {
+      return;
+    }
+
+    this.assetService.getAnalyticsByType(this.companyId).subscribe({
+      next: (res) => {
+        this.analyticsByType = res.data;
+        this.byTypeChartData = {
+          labels: res.data.map((row) => row.key),
+          datasets: [{ data: res.data.map((row) => row.count), label: 'Assets by type' }],
+        };
+      },
+    });
+
+    this.assetService.getAnalyticsByStatus(this.companyId).subscribe({
+      next: (res) => {
+        this.analyticsByStatus = res.data;
+        this.byStatusChartData = {
+          labels: res.data.map((row) => row.key),
+          datasets: [{ data: res.data.map((row) => row.count), label: 'Assets by status' }],
+        };
+      },
+    });
+
+    this.assetService.getAnalyticsByValue(this.companyId).subscribe({
+      next: (res) => {
+        this.analyticsByValue = res.data;
+        this.byValueChartData = {
+          labels: res.data.map((row) => row.key),
+          datasets: [{ data: res.data.map((row) => row.count), label: 'Assets by value' }],
+        };
+      },
+    });
+
+    this.assetService.getAnalyticsByClassification(this.companyId).subscribe({
+      next: (res) => {
+        this.analyticsByClassification = res.data;
+        this.byClassificationChartData = {
+          labels: res.data.map((row) => row.key),
+          datasets: [{ data: res.data.map((row) => row.count), label: 'Assets by classification' }],
+        };
+      },
+    });
+
+    this.assetService.getAnalyticsByMonth(this.companyId).subscribe({
+      next: (res) => {
+        this.analyticsByMonth = res.data;
+        this.byMonthChartData = {
+          labels: res.data.map((row) => row.label),
+          datasets: [{ data: res.data.map((row) => row.count), label: 'Assets by month' }],
+        };
+      },
+    });
+
+    this.assetService.getAnalyticsSummary(this.companyId).subscribe({
+      next: (res) => {
+        this.analyticsSummary = res.data;
+      },
+    });
+  }
+
+  private clearMessages(): void {
+    this.statusMessage = '';
+    this.errorMessage = '';
+  }
+
+  private toAsset(item: CompanyAssetListItem): Asset {
+    return {
+      asset_id: item.asset_id,
+      name: item.mongo?.name || `Asset ${item.asset_id}`,
+      type: item.mongo?.type || 'unknown',
+      description: item.mongo?.description,
+      classification: item.mongo?.classification,
+      location: item.mongo?.location,
+      owner: item.mongo?.owner,
+      value: item.mongo?.value,
+      status: item.mongo?.status,
+      risks: item.mongo?.risks || [],
+      controls: item.mongo?.controls || [],
+      created_at: item.mongo?.created_at,
+      updated_at: item.mongo?.updated_at,
+    };
+  }
+
+  private handleError(err: { status?: number; error?: { message?: string } }): void {
+    if (err?.status === 404) {
+      this.errorMessage = 'Asset not found.';
+      return;
+    }
+    if (err?.status === 400) {
+      this.errorMessage = err?.error?.message || 'Validation failed.';
+      return;
+    }
+    this.errorMessage = err?.error?.message || 'Request failed. Please retry.';
+  }
+}

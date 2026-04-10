@@ -1,0 +1,128 @@
+<mat-card class="asset-shell">
+  <mat-card-header>
+    <mat-card-title>Asset Management</mat-card-title>
+    <mat-card-subtitle>Company {{ companyId }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="toolbar">
+      <button mat-raised-button color="primary" (click)="loadAssets()">Refresh assets</button>
+      <button mat-stroked-button (click)="loadAnalytics()">Refresh analytics</button>
+    </div>
+
+    <h3>Create Asset</h3>
+    <div class="form-grid">
+      <input [(ngModel)]="createAssetModel.name" placeholder="Name*" />
+      <input [(ngModel)]="createAssetModel.type" placeholder="Type*" />
+      <input [(ngModel)]="createAssetModel.description" placeholder="Description" />
+      <input [(ngModel)]="createAssetModel.classification" placeholder="Classification" />
+      <input [(ngModel)]="createAssetModel.location" placeholder="Location" />
+      <input [(ngModel)]="createAssetModel.owner" placeholder="Owner" />
+      <input [(ngModel)]="createAssetModel.value" placeholder="Value" />
+      <input [(ngModel)]="createAssetModel.status" placeholder="Status" />
+      <input [(ngModel)]="createAssetModel.username" placeholder="Username*" />
+      <input [ngModel]="companyId" disabled placeholder="Company ID*" />
+    </div>
+    <button mat-raised-button color="primary" (click)="createAsset()">Create</button>
+
+    <h3>Assets</h3>
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="assets" class="mat-elevation-z1 full-width">
+        <ng-container matColumnDef="asset_id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.asset_id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.type }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.status || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.value || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="classification">
+          <th mat-header-cell *matHeaderCellDef>Classification</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.classification || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let asset">
+            <button mat-icon-button matTooltip="Edit" (click)="startEdit(asset)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteAsset(asset.asset_id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+
+    <h3>Edit Asset <span *ngIf="selectedAssetId">#{{ selectedAssetId }}</span></h3>
+    <div class="form-grid">
+      <input [(ngModel)]="updateAssetModel.name" placeholder="Name" />
+      <input [(ngModel)]="updateAssetModel.type" placeholder="Type" />
+      <input [(ngModel)]="updateAssetModel.description" placeholder="Description" />
+      <input [(ngModel)]="updateAssetModel.classification" placeholder="Classification" />
+      <input [(ngModel)]="updateAssetModel.location" placeholder="Location" />
+      <input [(ngModel)]="updateAssetModel.owner" placeholder="Owner" />
+      <input [(ngModel)]="updateAssetModel.value" placeholder="Value" />
+      <input [(ngModel)]="updateAssetModel.status" placeholder="Status" />
+    </div>
+    <button mat-raised-button color="accent" (click)="updateAsset()">Update</button>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="asset-shell">
+  <mat-card-header>
+    <mat-card-title>Asset Analytics</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="summary" *ngIf="analyticsSummary as summary">
+      <span>Total: {{ summary.totalAssets }}</span>
+      <span>High value: {{ summary.highValueAssets }}</span>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h4>By Type</h4>
+        <canvas baseChart [data]="byTypeChartData" [type]="'bar'"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>By Status</h4>
+        <canvas baseChart [data]="byStatusChartData" [type]="'doughnut'"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>By Value</h4>
+        <canvas baseChart [data]="byValueChartData" [type]="'pie'"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>By Classification</h4>
+        <canvas baseChart [data]="byClassificationChartData" [type]="'bar'"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>By Month</h4>
+        <canvas baseChart [data]="byMonthChartData" [type]="'line'"></canvas>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

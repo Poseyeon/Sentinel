@@ -175,4 +175,10 @@ export class AssetService {
       `${this.assetsBaseUrl}/analytics/summary?companyId=${Number(companyId)}`,
     );
   }
+
+  downloadAssets(companyId: number): Observable<Blob> {
+    return this.http.get(`${this.assetsBaseUrl}/export/docx/${Number(companyId)}`, {
+      responseType: 'blob',
+    });
+  }
 }

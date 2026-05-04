@@ -117,6 +117,33 @@ export class AssetManagementComponent implements OnInit {
     });
   }
 
+  downloadAssets(): void {
+    this.clearMessages();
+    if (!this.companyId) {
+      this.errorMessage = 'Missing company ID.';
+      return;
+    }
+
+    this.statusMessage = 'Preparing download...';
+    this.assetService.downloadAssets(this.companyId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `assets_company_${this.companyId}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        this.statusMessage = 'Download started.';
+      },
+      error: (err) => {
+        this.errorMessage = 'Download failed.';
+        this.handleError(err);
+      },
+    });
+  }
+
   createAsset(): void {
     this.clearMessages();
     if (!this.createAssetModel.name || !this.createAssetModel.type || !this.createAssetModel.username || !this.companyId) {

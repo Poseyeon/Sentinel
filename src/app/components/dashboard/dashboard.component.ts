@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { CommonModule } from '@angular/common';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { CreateUserComponent } from '../create-user/create-user.component';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AssetManagementComponent } from '../asset-management/asset-management.component';
 import { ProfileAvatarComponent } from '../profile-avatar/profile-avatar.component';
 
@@ -41,6 +41,8 @@ interface NavItem {
     CreateUserComponent,
     AssetManagementComponent,
     ProfileAvatarComponent,
+    RouterLink,
+    RouterLinkActive,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',

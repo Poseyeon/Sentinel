@@ -14,25 +14,25 @@
     <span class="spacer"></span>
 
     <!-- Profile Link -->
-    <a href="/profile" class="topbar-link">
+    <a routerLink="/profile" routerLinkActive="active" class="topbar-link">
       <mat-icon>person</mat-icon>
       <span>Profile</span>
     </a>
 
     <!-- Chat Link -->
-    <a href="/chat" class="topbar-link">
+    <a routerLink="/chat" routerLinkActive="active" class="topbar-link">
       <mat-icon>chat_bubble</mat-icon>
       <span>Chat</span>
     </a>
 
     <!-- Notification Link -->
-    <a href="/notifications" class="topbar-link">
+    <a routerLink="/notifications" routerLinkActive="active" class="topbar-link">
       <mat-icon>notifications</mat-icon>
       <span>Notifications</span>
     </a>
 
     <!-- Settings Link -->
-    <a href="/settings" class="topbar-link">
+    <a routerLink="/settings" routerLinkActive="active" class="topbar-link">
       <mat-icon>settings</mat-icon>
       <span>Settings</span>
     </a>
@@ -48,7 +48,7 @@
   <mat-sidenav mode="side" opened class="sidenav">
     <mat-nav-list class="nav-list">
       <mat-list-item *ngFor="let item of navItems" class="nav-item">
-        <a [href]="item.route" mat-list-item>{{ item.label }}</a>
+        <a [routerLink]="item.route" routerLinkActive="active" mat-list-item>{{ item.label }}</a>
       </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>

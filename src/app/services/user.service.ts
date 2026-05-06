@@ -15,7 +15,7 @@ export interface UserDto {
   providedIn: 'root',
 })
 export class UserService {
-  private readonly apiUrl = '/api/users';
+  private readonly apiUrl = '/api/users/preview';
   private readonly http = inject(HttpClient);
 
   getUserById(userId: number): Observable<UserDto> {

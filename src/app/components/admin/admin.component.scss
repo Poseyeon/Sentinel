@@ -1,0 +1,45 @@
+.admin-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stats-card {
+  text-align: center;
+}
+
+.stats-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3f51b5;
+  padding: 10px 0;
+}
+
+.users-card {
+  margin-top: 20px;
+}
+
+.admin-section {
+  display: block;
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-column-actions {
+  width: 100px;
+  text-align: center;
+}

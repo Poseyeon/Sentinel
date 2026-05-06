@@ -1,0 +1,33 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AdminUserDto, AdminStatsDto } from '../models/admin.dto';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AdminService {
+  private readonly apiUrl = '/api/admin';
+
+  constructor(private readonly http: HttpClient) {}
+
+  getAllUsers(): Observable<AdminUserDto[]> {
+    return this.http.get<AdminUserDto[]>(`${this.apiUrl}/users`);
+  }
+
+  getStats(): Observable<AdminStatsDto> {
+    return this.http.get<AdminStatsDto>(`${this.apiUrl}/stats`);
+  }
+
+  isAdmin(userId: number): Observable<{ isAdmin: boolean }> {
+    return this.http.get<{ isAdmin: boolean }>(`/api/users/${userId}/is-admin`);
+  }
+
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/users/${userId}`);
+  }
+
+  resetPassword(userId: number, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users/${userId}/reset-password`, { newPassword });
+  }
+}

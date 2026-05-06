@@ -31,7 +31,7 @@ export class CreateUserComponent {
 
   form = this.fb.group(
     {
-      userAbbr: ['', Validators.required],
+      username: ['', Validators.required],
       firstname: ['', Validators.required],
       surname: ['', Validators.required],
       role: ['', Validators.required],
@@ -51,8 +51,18 @@ export class CreateUserComponent {
 
   createUser(): void {
     if (this.form.valid) {
+      const currentUser = this.authService.getUser();
+      const payload: CreateUserDto = {
+        username: this.form.value.username!,
+        firstname: this.form.value.firstname!,
+        surname: this.form.value.surname!,
+        role: this.form.value.role!,
+        password: this.form.value.password!,
+        companyId: Number(currentUser?.companyId || 0),
+      };
+
       this.authService
-        .createUser(this.form.value as CreateUserDto)
+        .createUser(payload)
         .subscribe({
           next: (response) => {
             if (response.success) {

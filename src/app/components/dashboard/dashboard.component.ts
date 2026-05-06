@@ -38,7 +38,6 @@ interface NavItem {
     MatMenuModule,
     CommonModule,
     NavigationComponent,
-    CreateUserComponent,
     AssetManagementComponent,
     ProfileAvatarComponent,
     RouterLink,
@@ -59,6 +58,7 @@ export class DashboardComponent {
     { label: 'Policies', route: '/policies' },
     { label: 'Compliance and Audit', route: '/compliance-audit' },
     { label: 'Incident-Management', route: '/incident-management' },
+    { label: 'Admin', route: '/admin-login' },
   ];
 
   searchQuery: string = '';

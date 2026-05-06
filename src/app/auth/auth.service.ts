@@ -60,6 +60,14 @@ export class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
+  setRole(role: string): void {
+    const user = this.getUser();
+    if (user) {
+      user.role = role;
+      this.storeUser(user);
+    }
+  }
+
   private hasToken(): boolean {
     return !!this.getToken();
   }

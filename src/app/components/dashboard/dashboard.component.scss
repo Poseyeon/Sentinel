@@ -270,3 +270,51 @@
     align-items: stretch;
   }
 }
+
+.dashboard-section-card {
+  margin-top: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  mat-card-header {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 1rem;
+    display: block; // Allow internal flex to work
+  }
+
+  .card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  mat-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  mat-card-subtitle {
+    color: #6b7280;
+  }
+}
+
+.no-data-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+}
+
+mat-panel-description {
+  justify-content: flex-end;
+  align-items: center;
+}
+
+mat-chip-set {
+  display: flex;
+  gap: 8px;
+}

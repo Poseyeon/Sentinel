@@ -12,10 +12,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
 import { CommonModule } from '@angular/common';
 import { NavigationComponent } from '../navigation/navigation.component';
-import { CreateUserComponent } from '../create-user/create-user.component';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AssetManagementComponent } from '../asset-management/asset-management.component';
 import { ProfileAvatarComponent } from '../profile-avatar/profile-avatar.component';
+import { RiskManagementComponent } from '../risks/risk-management.component';
+import { ControlManagementComponent } from '../controls/control-management.component';
 
 interface NavItem {
   label: string;
@@ -40,6 +41,8 @@ interface NavItem {
     NavigationComponent,
     AssetManagementComponent,
     ProfileAvatarComponent,
+    RiskManagementComponent,
+    ControlManagementComponent,
     RouterLink,
     RouterLinkActive,
   ],
@@ -51,6 +54,8 @@ export class DashboardComponent {
   private readonly router = inject(Router);
   user = this.authService.getUser();
   readonly userId = Number(this.user?.userId || 0);
+  readonly companyId = Number(this.user?.companyId || 1);
+  readonly username = this.user?.username || '';
 
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard' },

@@ -261,6 +261,16 @@ export class ControlManagementComponent implements OnInit {
         category: 'technical',
         status: 'planned',
         description: '',
+        implementation: {
+          method: '',
+          responsible_team: '',
+          automation_level: 'manual',
+        },
+        effectiveness: {
+          rating: 'effective',
+          notes: '',
+        },
+        framework_refs: [],
       },
     });
 

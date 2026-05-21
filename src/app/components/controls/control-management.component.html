@@ -1,0 +1,82 @@
+<mat-card class="asset-shell">
+  <mat-card-header (click)="toggleManagement()" style="cursor: pointer;">
+    <div style="display: flex; flex-direction: column;">
+      <mat-card-title>Control Management</mat-card-title>
+      <mat-card-subtitle>Company {{ companyId }}</mat-card-subtitle>
+    </div>
+    <span class="spacer"></span>
+    <button mat-icon-button matTooltip="Add control" (click)="$event.stopPropagation(); openCreateControlDialog()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Refresh controls" (click)="$event.stopPropagation(); loadControls()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-icon-button (click)="$event.stopPropagation(); toggleManagement()">
+      <mat-icon>{{ isManagementCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content *ngIf="!isManagementCollapsed">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="controls" class="mat-elevation-z1 full-width">
+        <ng-container matColumnDef="control_id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let control">{{ control.control_id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let control">{{ control.mongo?.name || control.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef>Category</th>
+          <td mat-cell *matCellDef="let control">{{ control.mongo?.category || control.category }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let control">
+            <mat-chip [color]="getStatusColor(control.mongo?.status || control.status)" selected>
+              {{ control.mongo?.status || control.status }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+    <div *ngIf="controls.length === 0" class="no-data-msg">
+      No controls implemented yet.
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="asset-shell">
+  <mat-card-header (click)="toggleAnalytics()" style="cursor: pointer;">
+    <mat-card-title>Control Analytics</mat-card-title>
+    <span class="spacer"></span>
+    <button mat-icon-button matTooltip="Refresh analytics" (click)="$event.stopPropagation(); loadAnalytics()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-icon-button (click)="$event.stopPropagation(); toggleAnalytics()">
+      <mat-icon>{{ isAnalyticsCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content *ngIf="!isAnalyticsCollapsed">
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h4>Effectiveness</h4>
+        <canvas baseChart [data]="effectivenessChartData" [type]="'doughnut'"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Automation Degree</h4>
+        <canvas baseChart [data]="automationChartData" [type]="'bar'" [options]="horizontalBarOptions"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Framework Compliance</h4>
+        <canvas baseChart [data]="frameworkChartData" [type]="'radar'"></canvas>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

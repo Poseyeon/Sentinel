@@ -1,0 +1,46 @@
+.asset-shell {
+  margin: 16px 0;
+  border-radius: 12px;
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #e6e8eb;
+  border-radius: 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.no-data-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.chart-card {
+  border: 1px solid #e6e8eb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}

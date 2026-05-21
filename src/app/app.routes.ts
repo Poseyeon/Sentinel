@@ -29,6 +29,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'cxengine',
+    loadChildren: () => import('./cxengine/cxengine.routes').then(m => m.CX_ENGINE_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'cognetakb',
+    loadChildren: () => import('./cognetakb/cognetakb.routes').then(m => m.COGNETA_KB_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
     path: 'admin-login',
     component: AdminLoginComponent,
     canActivate: [authGuard],
